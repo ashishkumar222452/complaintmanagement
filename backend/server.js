@@ -22,10 +22,13 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: '*',
-    credentials: true
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   })
 );
+app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -35,6 +38,21 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Serve uploaded images statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Root Route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    message: 'Online Complaint Management System Backend is running successfully!',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      complaints: '/api/complaints',
+      categories: '/api/categories',
+      notifications: '/api/notifications'
+    }
+  });
+});
 
 // API Health Check
 app.get('/api/health', (req, res) => {

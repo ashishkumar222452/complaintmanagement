@@ -1,21 +1,29 @@
 import axios from 'axios';
 
-// Use VITE_API_URL in production (set on Vercel/Netlify/Render)
-// Falls back to localhost for local development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// In Vercel or cloud deployments with vercel.json rewrite, /api proxies directly to backend
+// In local dev without rewrite, defaults to VITE_API_URL or http://localhost:5000/api
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return '/api';
+  }
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000
+  timeout: 60000
 });
 
-// Helper: resolve image URLs relative to the backend host
-export const getImageUrl = (imagePath) => {
-  if (!imagePath) return null;
-  if (imagePath.startsWith('http')) return imagePath;
-  const backendBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api')
-    .replace('/api', '');
-  return `${backendBase}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+export const getImageUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+  const base = API_BASE_URL.replace(/\/api\/?$/, '');
+  return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
 // Request Interceptor: Attach JWT Token

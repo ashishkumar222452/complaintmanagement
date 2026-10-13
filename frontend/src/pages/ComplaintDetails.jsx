@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { complaintApi } from '../services/api';
+import { complaintApi, getImageUrl } from '../services/api';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { StatusBadge, PriorityBadge } from '../components/StatusBadge';
 import { Timeline } from '../components/Timeline';
@@ -224,7 +224,7 @@ export const ComplaintDetails = () => {
                   </h4>
                   <div className="relative inline-block border border-slate-200 rounded-xl overflow-hidden group">
                     <img
-                      src={complaint.imageUrl}
+                      src={getImageUrl(complaint.imageUrl)}
                       alt="Complaint attachment"
                       className="max-h-60 rounded-xl object-contain cursor-pointer"
                       onClick={() => setImageModalOpen(true)}
@@ -274,7 +274,7 @@ export const ComplaintDetails = () => {
         >
           <div className="text-center">
             <img
-              src={complaint.imageUrl}
+              src={getImageUrl(complaint.imageUrl)}
               alt="Enlarged complaint evidence"
               className="max-h-[75vh] mx-auto rounded-lg object-contain"
             />
