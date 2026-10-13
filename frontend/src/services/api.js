@@ -1,9 +1,22 @@
 import axios from 'axios';
 
+// Use VITE_API_URL in production (set on Vercel/Netlify/Render)
+// Falls back to localhost for local development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
   timeout: 15000
 });
+
+// Helper: resolve image URLs relative to the backend host
+export const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  const backendBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api')
+    .replace('/api', '');
+  return `${backendBase}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+};
 
 // Request Interceptor: Attach JWT Token
 api.interceptors.request.use(
